@@ -1,0 +1,9 @@
+{
+  "watch": ["routes", "app.js", "bin"],
+  "ext": "js,json",
+  "ignore": ["src/**/*", "node_modules/**/*", "webpack.config.js"],
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "delay": "1000"
+}

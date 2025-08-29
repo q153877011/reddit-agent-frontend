@@ -1,5 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
+require('dotenv').config();
 
 module.exports = {
   entry: './src/index.js',
@@ -29,13 +31,16 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html'
+    }),
+    new webpack.DefinePlugin({
+      'process.env.REACT_APP_SERVER_BASE_URL': JSON.stringify(process.env.REACT_APP_SERVER_BASE_URL || 'http://localhost:3000')
     })
   ],
   devServer: {
     static: {
       directory: path.join(__dirname, 'dist')
     },
-    port: 3001,
+    port: 3002,
     proxy: [
       {
         context: ['/item'],
