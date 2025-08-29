@@ -23,6 +23,24 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// 添加全局CORS中间件允许跨域请求
+app.use((req, res, next) => {
+  // 允许特定来源的跨域请求（支持credentials）
+  res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
+  // 允许发送凭据
+  res.header('Access-Control-Allow-Credentials', 'true');
+  // 允许的请求头
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  // 允许的HTTP方法
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  // 处理预检请求
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/item', itemRouter);

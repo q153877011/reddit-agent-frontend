@@ -1,24 +1,6 @@
 var express = require('express');
 var router = express.Router();
 
-// 添加CORS中间件允许跨域请求
-router.use((req, res, next) => {
-  // 允许特定来源的跨域请求（支持credentials）
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
-  // 允许发送凭据
-  res.header('Access-Control-Allow-Credentials', 'true');
-  // 允许的请求头
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  // 允许的HTTP方法
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  // 处理预检请求
-  if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-  } else {
-    next();
-  }
-});
-
 /* POST route */
 router.post('/', async function(req, res, next) {
   try {
@@ -94,10 +76,7 @@ router.get('/', async function(req, res, next) {
     res.writeHead(200, {
        'Content-Type': 'text/event-stream',
        'Cache-Control': 'no-cache',
-       'Connection': 'keep-alive',
-       'Access-Control-Allow-Origin': 'http://localhost:3001',
-       'Access-Control-Allow-Credentials': 'true',
-       'Access-Control-Allow-Headers': 'Cache-Control'
+       'Connection': 'keep-alive'
      });
      
     // 设置超时处理（2分钟）
@@ -193,9 +172,7 @@ router.get('/', async function(req, res, next) {
     
     if (!res.headersSent) {
       res.writeHead(500, {
-         'Content-Type': 'text/event-stream',
-         'Access-Control-Allow-Origin': 'http://localhost:3001',
-         'Access-Control-Allow-Credentials': 'true'
+         'Content-Type': 'text/event-stream'
        });
     }
     

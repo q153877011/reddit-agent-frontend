@@ -1,22 +1,6 @@
 var express = require('express');
 var router = express.Router();
 
-// 添加CORS中间件允许跨域请求
-router.use((req, res, next) => {
-  // 允许所有来源的跨域请求
-  res.header('Access-Control-Allow-Origin', '*');
-  // 允许的请求头
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  // 允许的HTTP方法
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  // 处理预检请求
-  if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-  } else {
-    next();
-  }
-});
-
 const Imap = require('node-imap');
 const { simpleParser } = require('mailparser');
 
