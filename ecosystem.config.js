@@ -1,12 +1,13 @@
 module.exports = {
   apps: [
     {
-      name: 'ai-reddit-express',
+      name: 'ai-reddit-express-backend',
       script: './bin/www',
       instances: 1,
       autorestart: true,
-      watch: false,
-      max_memory_restart: '1G',
+      watch: ['routes', 'app.js', 'bin'],
+      ignore_watch: ['node_modules', 'logs', 'src', 'dist'],
+      max_memory_restart: '512M',
       env: {
         NODE_ENV: 'development',
         PORT: 3000
@@ -15,27 +16,34 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 3000
       },
-      error_file: './logs/err.log',
-      out_file: './logs/out.log',
-      log_file: './logs/combined.log',
+      error_file: './logs/backend-err.log',
+      out_file: './logs/backend-out.log',
+      log_file: './logs/backend-combined.log',
       time: true,
-      log_date_format: 'YYYY-MM-DD HH:mm Z'
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      kill_timeout: 5000,
+      restart_delay: 1000
     },
     {
-      name: 'ai-reddit-react',
+      name: 'ai-reddit-react-frontend',
       script: 'npm',
       args: 'run dev-server',
       instances: 1,
       autorestart: true,
-      watch: false,
+      watch: ['src', 'webpack.config.js'],
+      ignore_watch: ['node_modules', 'logs', 'routes', 'dist'],
       env: {
         NODE_ENV: 'development'
       },
-      error_file: './logs/react-err.log',
-      out_file: './logs/react-out.log',
-      log_file: './logs/react-combined.log',
+      error_file: './logs/frontend-err.log',
+      out_file: './logs/frontend-out.log',
+      log_file: './logs/frontend-combined.log',
       time: true,
-      log_date_format: 'YYYY-MM-DD HH:mm Z'
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      kill_timeout: 5000,
+      restart_delay: 1000
     }
   ],
 

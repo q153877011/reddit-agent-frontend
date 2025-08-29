@@ -1,4 +1,5 @@
 require('dotenv').config();
+const cors = require('cors');
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -22,24 +23,36 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+const corsOptions = {
+  origin: [
+    'http://localhost:3001',
+    'http://9.134.53.93:3001',
+    'http://127.0.0.1:3001'
+  ],
+  credentials: true, // 如果需要发送 cookies
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
+};
 // 添加全局CORS中间件允许跨域请求
-app.use((req, res, next) => {
-  // 允许特定来源的跨域请求（支持credentials）
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
-  // 允许发送凭据
-  res.header('Access-Control-Allow-Credentials', 'true');
-  // 允许的请求头
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  // 允许的HTTP方法
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  // 处理预检请求
-  if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-  } else {
-    next();
-  }
-});
+// app.use((req, res, next) => {
+//   // 允许特定来源的跨域请求（支持credentials）
+//   res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
+//   // 允许发送凭据
+//   res.header('Access-Control-Allow-Credentials', 'true');
+//   // 允许的请求头
+//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+//   // 允许的HTTP方法
+//   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+//   // 处理预检请求
+//   if (req.method === 'OPTIONS') {
+//     res.sendStatus(200);
+//   } else {
+//     next();
+//   }
+// });
+
+app.use(cors(corsOptions));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
