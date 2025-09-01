@@ -1,20 +1,18 @@
-var express = require('express');
-var router = express.Router();
-
-const Imap = require('node-imap');
-const { simpleParser } = require('mailparser');
+const cron = require('node-cron');
 const mysql = require('mysql2/promise');
 
 // 数据库连接配置
 const dbConfig = {
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || 3306,
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'edgeone',
   charset: 'utf8mb4'
 };
 
+const Imap = require('node-imap');
+const { simpleParser } = require('mailparser');
 
 // 插入数据到数据库的函数（带去重检查）
 async function insertCrawlMessage(url, date) {
@@ -49,78 +47,6 @@ async function insertCrawlMessage(url, date) {
     }
   }
 }
-
-// 从数据库获取邮件数据
-async function getEmailsFromDatabase() {
-  let connection;
-  try {
-    connection = await mysql.createConnection(dbConfig);
-    const [rows] = await connection.execute(
-      'SELECT * FROM crawl_message ORDER BY date DESC LIMIT 100'
-    );
-    return rows;
-  } catch (error) {
-    console.error('从数据库获取邮件失败:', error);
-    throw error;
-  } finally {
-    if (connection) {
-      await connection.end();
-    }
-  }
-}
-
-/* GET home page. */
-router.get('/', async function(req, res, next) {
-  try {
-    // 从数据库获取数据，而不是实时抓取
-    const mail_list = await getEmailsFromDatabase();
-    console.log(mail_list)
-    res.json({ 
-      mailList: mail_list,
-      contentType: req.get('Content-Type')
-    });
-  } catch (error) {
-    console.error('获取邮件数据时出错:', error);
-    res.status(500).json({ 
-      message: 'Error getting emails from database', 
-      error: error.message 
-    });
-  }
-});
-
-// 手动触发邮件抓取的路由
-router.post('/fetch', async function(req, res, next) {
-  try {
-    console.log('手动触发邮件抓取...');
-    // 触发定时任务执行
-    const emailCronJob = require('../services/emailCronJob');
-    await emailCronJob.manualExecute();
-    
-    // 从数据库获取最新数据
-    const mail_list = await getEmailsFromDatabase();
-    res.json({ 
-      message: '邮件抓取完成',
-      count: mail_list.length,
-      mailList: mail_list
-    });
-  } catch (error) {
-    console.error('手动抓取邮件时出错:', error);
-    res.status(500).json({ 
-      message: 'Error manually scanning emails', 
-      error: error.message 
-    });
-  }
-});
-
-// 获取定时任务状态的路由
-router.get('/status', function(req, res, next) {
-  const emailCronJob = require('../services/emailCronJob');
-  const status = emailCronJob.getStatus();
-  res.json({
-    message: '邮件定时抓取服务状态',
-    status: status
-  });
-});
 
 // 扫描邮件的异步函数
 function scanEmails() {
@@ -194,7 +120,6 @@ function scanEmails() {
                 }
                 
                 // 匹配Reddit Posts后面的链接
-                // 匹配格式: [0] Reddit Posts (/r/xxx/): 'title' [0] https://...
                 const redditLinkMatch = parsed.text.match(/Reddit Posts[\s\S]*?\n\s*(https?:\/\/[^\s\n]+)/i);
                 const receviedTime = parsed.date;
                 const url = redditLinkMatch ? redditLinkMatch[1] : '';
@@ -240,4 +165,83 @@ function scanEmails() {
   });
 }
 
-module.exports = router;
+class EmailCronJob {
+  constructor() {
+    this.isRunning = false;
+    this.task = null;
+  }
+
+  // 启动定时任务
+  start() {
+    if (this.task) {
+      console.log('定时任务已经在运行中');
+      return;
+    }
+
+    console.log('启动邮件定时抓取任务...');
+    
+    // 每小时的第0分钟执行
+    this.task = cron.schedule('0 * * * *', async () => {
+      await this.executeTask();
+    }, {
+      scheduled: true,
+      timezone: "Asia/Shanghai"
+    });
+
+    console.log('定时任务已启动，每小时抓取一次邮件');
+    
+    // 启动时立即执行一次
+    setTimeout(() => {
+      this.executeTask();
+    }, 5000); // 延迟5秒执行，确保应用完全启动
+  }
+
+  // 停止定时任务
+  stop() {
+    if (this.task) {
+      this.task.stop();
+      this.task = null;
+      console.log('定时任务已停止');
+    }
+  }
+
+  // 执行抓取任务
+  async executeTask() {
+    if (this.isRunning) {
+      console.log('邮件抓取任务正在运行中，跳过本次执行');
+      return;
+    }
+
+    this.isRunning = true;
+    const startTime = new Date();
+    console.log(`开始定时抓取邮件 - ${startTime.toLocaleString()}`);
+
+    try {
+      const emailList = await scanEmails();
+      const endTime = new Date();
+      const duration = endTime - startTime;
+      console.log(`定时任务完成，抓取到 ${emailList.length} 封邮件，耗时 ${duration}ms - ${endTime.toLocaleString()}`);
+    } catch (error) {
+      console.error('定时抓取邮件时出错:', error);
+    } finally {
+      this.isRunning = false;
+    }
+  }
+
+  // 手动执行任务
+  async manualExecute() {
+    console.log('手动触发邮件抓取任务...');
+    await this.executeTask();
+  }
+
+  // 获取任务状态
+  getStatus() {
+    return {
+      isScheduled: !!this.task,
+      isRunning: this.isRunning,
+      nextExecution: this.task ? '每小时的第0分钟' : '未启动'
+    };
+  }
+}
+
+module.exports = new EmailCronJob();

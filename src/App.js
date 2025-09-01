@@ -169,7 +169,7 @@ function RedditPage() {
                         </a>
                       </div>
                       <div className="mail-time">
-                        {new Date(mail.receviedTime).toLocaleString('zh-CN')}
+                        {mail.date ? new Date(mail.date).toLocaleString('zh-CN') : '未知时间'}
                       </div>
                     </div>
                   </div>

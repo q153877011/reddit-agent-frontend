@@ -12,6 +12,11 @@ var itemRouter = require('./routes/item');
 var answerRouter = require('./routes/answer');
 var scanGmailRouter = require('./routes/scan-gmail');
 
+// 启动邮件定时抓取服务
+const emailCronJob = require('./services/emailCronJob');
+emailCronJob.start();
+console.log('邮件定时抓取服务已启动');
+
 var app = express();
 
 // view engine setup
