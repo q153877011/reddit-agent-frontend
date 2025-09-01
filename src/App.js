@@ -28,7 +28,7 @@ function RedditPage() {
   const fetchRecords = async () => {
     try {
       setLoading(true);
-      const serverUrl = process.env.REACT_APP_SERVER_BASE_URL || 'http://localhost:3000';
+      const serverUrl = process.env.SERVER_BASE_URL;
       const response = await fetch(`${serverUrl}/item`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -47,7 +47,7 @@ function RedditPage() {
     try {
       setMailLoading(true);
       setMailError(null);
-      const serverUrl = process.env.REACT_APP_SERVER_BASE_URL || 'http://localhost:3000';
+      const serverUrl = process.env.SERVER_BASE_URL;
       const response = await fetch(`${serverUrl}/scan-gmail`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

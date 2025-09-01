@@ -23,7 +23,7 @@ function GetAnswer({ recordId = null }) {
 
       setRecordLoading(true);
       try {
-        const serverUrl = process.env.REACT_APP_SERVER_BASE_URL || 'http://localhost:3000';
+        const serverUrl = process.env.SERVER_BASE_URL;
         const response = await fetch(`${serverUrl}/item`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -60,7 +60,7 @@ function GetAnswer({ recordId = null }) {
     setAnswer('');
     setExtractedTitles([]);
 
-    const serverUrl = process.env.REACT_APP_SERVER_BASE_URL || 'http://localhost:3000';
+    const serverUrl = process.env.SERVER_BASE_URL;
     const eventSource = new EventSource(`${serverUrl}/answer?question=${encodeURIComponent(question)}`, {
       withCredentials: true,
     });
@@ -240,7 +240,7 @@ function GetAnswer({ recordId = null }) {
       
       if (recordId) {
         // 有ID时更新现有记录
-        const serverUrl = process.env.REACT_APP_SERVER_BASE_URL || 'http://localhost:3000';
+        const serverUrl = process.env.SERVER_BASE_URL;
         response = await fetch(`${serverUrl}/item/${recordId}`, {
           method: 'PUT',
           headers: {
@@ -252,7 +252,7 @@ function GetAnswer({ recordId = null }) {
         });
       } else {
         // 没有ID时新建记录
-        const serverUrl = process.env.REACT_APP_SERVER_BASE_URL || 'http://localhost:3000';
+        const serverUrl = process.env.SERVER_BASE_URL;
         response = await fetch(`${serverUrl}/item`, {
           method: 'POST',
           headers: {

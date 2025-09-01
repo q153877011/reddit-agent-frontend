@@ -33,7 +33,7 @@ module.exports = {
       template: './src/index.html'
     }),
     new webpack.DefinePlugin({
-      'process.env.REACT_APP_SERVER_BASE_URL': JSON.stringify(process.env.REACT_APP_SERVER_BASE_URL || 'http://localhost:3000')
+      'process.env.REACT_APP_SERVER_BASE_URL': JSON.stringify(process.env.SERVER_BASE_URL)
     })
   ],
   devServer: {
@@ -44,7 +44,7 @@ module.exports = {
     proxy: [
       {
         context: ['/item'],
-        target: 'http://localhost:3000',
+        target: process.env.SERVER_BASE_URL,
         changeOrigin: true
       }
     ]

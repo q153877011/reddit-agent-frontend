@@ -31,9 +31,10 @@ const corsOptions = {
   origin: [
     'http://localhost:3000',
     'http://9.134.53.93:3000',
-    'http://127.0.0.1:3000'
+    'http://127.0.0.1:3000',
+    process.env.SERVER_BASE_URL
   ],
-  credentials: true, // 如果需要发送 cookies
+  // credentials: true, // 如果需要发送 cookies
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']

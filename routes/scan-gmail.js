@@ -9,8 +9,9 @@ const { simpleParser } = require('mailparser');
 router.get('/', async function(req, res, next) {
   try {
     const mail_list = await scanEmails();
+    const mail_list_time_reverse = mail_list.reverse();
     res.json({ 
-      mailList: mail_list,
+      mailList: mail_list_time_reverse,
       contentType: req.get('Content-Type')
     });
   } catch (error) {
