@@ -33,7 +33,7 @@ module.exports = {
       template: './src/index.html'
     }),
     new webpack.DefinePlugin({
-      'process.env.REACT_APP_SERVER_BASE_URL': JSON.stringify(process.env.SERVER_BASE_URL)
+      'process.env.SERVER_BASE_URL': JSON.stringify(process.env.SERVER_BASE_URL || 'http://localhost:3000')
     })
   ],
   devServer: {
