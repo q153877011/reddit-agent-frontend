@@ -6,6 +6,7 @@
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
     "build": "webpack --mode production",
+    "build:prod": "npm run build && npm start",
     "dev-server": "webpack serve --mode development --port 3001 --hot",
     "dev-frontend": "webpack serve --mode development --port 3001 --open --hot",
     "dev-all": "concurrently \"npm run dev\" \"npm run dev-server\"",

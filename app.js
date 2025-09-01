@@ -23,11 +23,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// 托管前端构建文件
+app.use(express.static(path.join(__dirname, 'dist')));
+
 const corsOptions = {
   origin: [
-    'http://localhost:3001',
-    'http://9.134.53.93:3001',
-    'http://127.0.0.1:3001'
+    'http://localhost:3000',
+    'http://9.134.53.93:3000',
+    'http://127.0.0.1:3000'
   ],
   credentials: true, // 如果需要发送 cookies
   optionsSuccessStatus: 200,
@@ -59,6 +63,16 @@ app.use('/users', usersRouter);
 app.use('/item', itemRouter);
 app.use('/answer', answerRouter);
 app.use('/scan-gmail', scanGmailRouter);
+
+// SPA回退路由 - 对于非API请求，返回index.html
+app.get('*', (req, res) => {
+  // 如果请求的是API路径，继续404处理
+  if (req.path.startsWith('/api/') || req.path.startsWith('/users') || req.path.startsWith('/item') || req.path.startsWith('/answer') || req.path.startsWith('/scan-gmail')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  // 否则返回前端应用
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
