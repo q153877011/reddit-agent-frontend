@@ -1,8 +1,13 @@
 /* App.css */
 .app {
-  min-height: 100vh;
+  height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* 防止过度滚动 */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* 导航栏样式 */

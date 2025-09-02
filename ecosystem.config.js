@@ -8,6 +8,7 @@ module.exports = {
       watch: ['routes', 'app.js', 'bin', 'dist'],
       ignore_watch: ['node_modules', 'logs', 'src'],
       max_memory_restart: '512M',
+      pre_deploy: 'npm run build',
       env: {
         NODE_ENV: 'development',
         PORT: 3000
